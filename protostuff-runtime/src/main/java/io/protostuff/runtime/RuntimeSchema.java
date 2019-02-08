@@ -1,21 +1,7 @@
 //========================================================================
-//Copyright 2007-2009 David Yu dyuproject@gmail.com
-//------------------------------------------------------------------------
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at 
-//http://www.apache.org/licenses/LICENSE-2.0
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
-//========================================================================
-
 package io.protostuff.runtime;
 
 import static io.protostuff.runtime.RuntimeEnv.ID_STRATEGY;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -25,7 +11,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-
 import io.protostuff.Exclude;
 import io.protostuff.Message;
 import io.protostuff.Pipe;
@@ -41,8 +26,7 @@ import io.protostuff.runtime.RuntimeEnv.Instantiator;
  * @author David Yu
  * @created Nov 9, 2009
  */
-public final class RuntimeSchema<T> extends MappedSchema<T>
-{
+public final class RuntimeSchema<T> extends MappedSchema<T> {
 
     private static final Set<String> NO_EXCLUSIONS = Collections.emptySet();
 
@@ -59,13 +43,11 @@ public final class RuntimeSchema<T> extends MappedSchema<T>
      * @throws IllegalArgumentException
      *             if the {@code typeClass} is an interface or an abstract class.
      */
-    public static <T> boolean map(Class<? super T> baseClass, Class<T> typeClass)
-    {
-        if (ID_STRATEGY instanceof DefaultIdStrategy)
+    public static <T extends java.lang.Object> boolean map(Class<? super T> baseClass, Class<T> typeClass) {
+        if (ID_STRATEGY instanceof DefaultIdStrategy) {
             return ((DefaultIdStrategy) ID_STRATEGY).map(baseClass, typeClass);
-
-        throw new RuntimeException(
-                "RuntimeSchema.map is only supported on DefaultIdStrategy");
+        }
+        throw new RuntimeException("RuntimeSchema.map is only supported on DefaultIdStrategy");
     }
 
     /**
@@ -74,14 +56,11 @@ public final class RuntimeSchema<T> extends MappedSchema<T>
      * <p>
      * NOTE: This is only supported when {@link RuntimeEnv#ID_STRATEGY} is {@link DefaultIdStrategy}.
      */
-    public static <T> boolean register(Class<T> typeClass, Schema<T> schema)
-    {
-        if (ID_STRATEGY instanceof DefaultIdStrategy)
-            return ((DefaultIdStrategy) ID_STRATEGY).registerPojo(typeClass,
-                    schema);
-
-        throw new RuntimeException(
-                "RuntimeSchema.register is only supported on DefaultIdStrategy");
+    public static <T extends java.lang.Object> boolean register(Class<T> typeClass, Schema<T> schema) {
+        if (ID_STRATEGY instanceof DefaultIdStrategy) {
+            return ((DefaultIdStrategy) ID_STRATEGY).registerPojo(typeClass, schema);
+        }
+        throw new RuntimeException("RuntimeSchema.register is only supported on DefaultIdStrategy");
     }
 
     /**
@@ -89,16 +68,14 @@ public final class RuntimeSchema<T> extends MappedSchema<T>
      * <p>
      * Method overload for backwards compatibility.
      */
-    public static boolean isRegistered(Class<?> typeClass)
-    {
+    public static boolean isRegistered(Class<?> typeClass) {
         return isRegistered(typeClass, ID_STRATEGY);
     }
 
     /**
      * Returns true if the {@code typeClass} was not lazily created.
      */
-    public static boolean isRegistered(Class<?> typeClass, IdStrategy strategy)
-    {
+    public static boolean isRegistered(Class<?> typeClass, IdStrategy strategy) {
         return strategy.isRegistered(typeClass);
     }
 
@@ -107,17 +84,14 @@ public final class RuntimeSchema<T> extends MappedSchema<T>
      * <p>
      * Method overload for backwards compatibility.
      */
-    public static <T> Schema<T> getSchema(Class<T> typeClass)
-    {
+    public static <T extends java.lang.Object> Schema<T> getSchema(Class<T> typeClass) {
         return getSchema(typeClass, ID_STRATEGY);
     }
 
     /**
      * Gets the schema that was either registered or lazily initialized at runtime.
      */
-    public static <T> Schema<T> getSchema(Class<T> typeClass,
-            IdStrategy strategy)
-    {
+    public static <T extends java.lang.Object> Schema<T> getSchema(Class<T> typeClass, IdStrategy strategy) {
         return strategy.getSchemaWrapper(typeClass, true).getSchema();
     }
 
@@ -126,17 +100,14 @@ public final class RuntimeSchema<T> extends MappedSchema<T>
      * <p>
      * Method overload for backwards compatibility.
      */
-    static <T> HasSchema<T> getSchemaWrapper(Class<T> typeClass)
-    {
+    static <T extends java.lang.Object> HasSchema<T> getSchemaWrapper(Class<T> typeClass) {
         return getSchemaWrapper(typeClass, ID_STRATEGY);
     }
 
     /**
      * Returns the schema wrapper.
      */
-    static <T> HasSchema<T> getSchemaWrapper(Class<T> typeClass,
-            IdStrategy strategy)
-    {
+    static <T extends java.lang.Object> HasSchema<T> getSchemaWrapper(Class<T> typeClass, IdStrategy strategy) {
         return strategy.getSchemaWrapper(typeClass, true);
     }
 
@@ -145,197 +116,125 @@ public final class RuntimeSchema<T> extends MappedSchema<T>
      * <p>
      * Method overload for backwards compatibility.
      */
-    public static <T> RuntimeSchema<T> createFrom(Class<T> typeClass)
-    {
+    public static <T extends java.lang.Object> RuntimeSchema<T> createFrom(Class<T> typeClass) {
         return createFrom(typeClass, NO_EXCLUSIONS, ID_STRATEGY);
     }
 
     /**
      * Generates a schema from the given class.
      */
-    public static <T> RuntimeSchema<T> createFrom(Class<T> typeClass,
-            IdStrategy strategy)
-    {
+    public static <T extends java.lang.Object> RuntimeSchema<T> createFrom(Class<T> typeClass, IdStrategy strategy) {
         return createFrom(typeClass, NO_EXCLUSIONS, strategy);
     }
 
     /**
      * Generates a schema from the given class with the exclusion of certain fields.
      */
-    public static <T> RuntimeSchema<T> createFrom(Class<T> typeClass,
-            String[] exclusions, IdStrategy strategy)
-    {
-        HashSet<String> set = new HashSet<String>();
-        for (String exclusion : exclusions)
+    public static <T extends java.lang.Object> RuntimeSchema<T> createFrom(Class<T> typeClass, String[] exclusions, IdStrategy strategy) {
+        HashSet<String> set = new HashSet<>();
+        for (String exclusion : exclusions) {
             set.add(exclusion);
-
+        }
         return createFrom(typeClass, set, strategy);
     }
 
     /**
      * Generates a schema from the given class with the exclusion of certain fields.
      */
-    public static <T> RuntimeSchema<T> createFrom(Class<T> typeClass,
-            Set<String> exclusions, IdStrategy strategy)
-    {
-        if (typeClass.isInterface()
-                || Modifier.isAbstract(typeClass.getModifiers()))
-        {
-            throw new RuntimeException(
-                    "The root object can neither be an abstract "
-                            + "class nor interface: \"" + typeClass.getName());
+    public static <T extends java.lang.Object> RuntimeSchema<T> createFrom(Class<T> typeClass, Set<String> exclusions, IdStrategy strategy) {
+        if (typeClass.isInterface() || Modifier.isAbstract(typeClass.getModifiers())) {
+            throw new RuntimeException("The root object can neither be an abstract " + "class nor interface: \"" + typeClass.getName());
         }
-
         final Map<String, java.lang.reflect.Field> fieldMap = findInstanceFields(typeClass);
-        final ArrayList<Field<T>> fields = new ArrayList<Field<T>>(
-                fieldMap.size());
+        final ArrayList<Field<T>> fields = new ArrayList<>(fieldMap.size());
         int i = 0;
         int maxFieldMapping = 0;
         boolean annotated = false;
-        for (java.lang.reflect.Field f : fieldMap.values())
-        {
-            if (!exclusions.contains(f.getName()))
-            {
-                if (f.getAnnotation(Deprecated.class) != null)
-                {
-                    // this field should be ignored by ProtoStuff.
-                    // preserve its field number for backward-forward compat
+        for (java.lang.reflect.Field f : fieldMap.values()) {
+            if (!exclusions.contains(f.getName())) {
+                if (f.getAnnotation(Deprecated.class) != null) {
                     i++;
                     continue;
                 }
-
                 final Tag tag = f.getAnnotation(Tag.class);
                 final int fieldMapping;
                 final String name;
-                if (tag == null)
-                {
-                    // Fields gets assigned mapping tags according to their
-                    // definition order
-                    if (annotated)
-                    {
-                        throw new RuntimeException(
-                                "When using annotation-based mapping, "
-                                        + "all fields must be annotated with @"
-                                        + Tag.class.getSimpleName());
+                if (tag == null) {
+                    if (annotated) {
+                        throw new RuntimeException("When using annotation-based mapping, " + "all fields must be annotated with @" + Tag.class.getSimpleName());
                     }
                     fieldMapping = ++i;
-
                     name = f.getName();
-                }
-                else
-                {
-                    // Fields gets assigned mapping tags according to their
-                    // annotation
-                    if (!annotated && !fields.isEmpty())
-                    {
-                        throw new RuntimeException(
-                                "When using annotation-based mapping, "
-                                        + "all fields must be annotated with @"
-                                        + Tag.class.getSimpleName());
+                } else {
+                    if (!annotated && !fields.isEmpty()) {
+                        throw new RuntimeException("When using annotation-based mapping, " + "all fields must be annotated with @" + Tag.class.getSimpleName());
                     }
                     annotated = true;
                     fieldMapping = tag.value();
-
-                    if (fieldMapping < 1)
-                    {
-                        throw new RuntimeException("Invalid field number: "
-                                + fieldMapping + " on " + typeClass);
+                    if (fieldMapping < 1) {
+                        throw new RuntimeException("Invalid field number: " + fieldMapping + " on " + typeClass);
                     }
-
                     name = tag.alias().isEmpty() ? f.getName() : tag.alias();
                 }
-
-                final Field<T> field = RuntimeFieldFactory.getFieldFactory(
-                        f.getType(), strategy).create(fieldMapping, name, f,
-                        strategy);
+                final Field<T> field = RuntimeFieldFactory.getFieldFactory(f.getType(), strategy).create(fieldMapping, name, f, strategy);
                 fields.add(field);
-
                 maxFieldMapping = Math.max(maxFieldMapping, fieldMapping);
             }
         }
-
-        return new RuntimeSchema<T>(typeClass, fields, maxFieldMapping,
-                RuntimeEnv.newInstantiator(typeClass));
+        return new RuntimeSchema<>(typeClass, fields, maxFieldMapping, RuntimeEnv.newInstantiator(typeClass));
     }
 
     /**
      * Generates a schema from the given class with the declared fields (inclusive) based from the given Map. The value
      * of a the Map's entry will be the name used for the field (which enables aliasing).
      */
-    public static <T> RuntimeSchema<T> createFrom(Class<T> typeClass,
-            Map<String, String> declaredFields, IdStrategy strategy)
-    {
-        if (typeClass.isInterface()
-                || Modifier.isAbstract(typeClass.getModifiers()))
-        {
-            throw new RuntimeException(
-                    "The root object can neither be an abstract "
-                            + "class nor interface: \"" + typeClass.getName());
+    public static <T extends java.lang.Object> RuntimeSchema<T> createFrom(Class<T> typeClass, Map<String, String> declaredFields, IdStrategy strategy) {
+        if (typeClass.isInterface() || Modifier.isAbstract(typeClass.getModifiers())) {
+            throw new RuntimeException("The root object can neither be an abstract " + "class nor interface: \"" + typeClass.getName());
         }
-
-        final ArrayList<Field<T>> fields = new ArrayList<Field<T>>(
-                declaredFields.size());
+        final ArrayList<Field<T>> fields = new ArrayList<>(declaredFields.size());
         int i = 0;
-        for (Map.Entry<String, String> entry : declaredFields.entrySet())
-        {
+        for (Map.Entry<String, String> entry : declaredFields.entrySet()) {
             final java.lang.reflect.Field f;
-            try
-            {
+            try {
                 f = typeClass.getDeclaredField(entry.getKey());
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Exception on field: " + entry.getKey(), e);
             }
-            catch (Exception e)
-            {
-                throw new IllegalArgumentException("Exception on field: "
-                        + entry.getKey(), e);
-            }
-
             final int mod = f.getModifiers();
-            if (!Modifier.isStatic(mod) && !Modifier.isTransient(mod) && f.getAnnotation(Exclude.class) == null)
-            {
-                final Field<T> field = RuntimeFieldFactory.getFieldFactory(
-                        f.getType(), strategy).create(++i, entry.getValue(), f,
-                        strategy);
+            if (!Modifier.isStatic(mod) && !Modifier.isTransient(mod) && f.getAnnotation(Exclude.class) == null) {
+                final Field<T> field = RuntimeFieldFactory.getFieldFactory(f.getType(), strategy).create(++i, entry.getValue(), f, strategy);
                 fields.add(field);
             }
         }
-        return new RuntimeSchema<T>(typeClass, fields, i,
-                RuntimeEnv.newInstantiator(typeClass));
+        return new RuntimeSchema<>(typeClass, fields, i, RuntimeEnv.newInstantiator(typeClass));
     }
 
-    static Map<String, java.lang.reflect.Field> findInstanceFields(
-            Class<?> typeClass)
-    {
-        LinkedHashMap<String, java.lang.reflect.Field> fieldMap = new LinkedHashMap<String, java.lang.reflect.Field>();
+    static Map<String, java.lang.reflect.Field> findInstanceFields(Class<?> typeClass) {
+        LinkedHashMap<String, java.lang.reflect.Field> fieldMap = new LinkedHashMap<>();
         fill(fieldMap, typeClass);
         return fieldMap;
     }
 
-    static void fill(Map<String, java.lang.reflect.Field> fieldMap,
-            Class<?> typeClass)
-    {
-        if (Object.class != typeClass.getSuperclass())
+    static void fill(Map<String, java.lang.reflect.Field> fieldMap, Class<?> typeClass) {
+        if (Object.class != typeClass.getSuperclass()) {
             fill(fieldMap, typeClass.getSuperclass());
-
-        for (java.lang.reflect.Field f : typeClass.getDeclaredFields())
-        {
+        }
+        for (java.lang.reflect.Field f : typeClass.getDeclaredFields()) {
             int mod = f.getModifiers();
-            if (!Modifier.isStatic(mod) && !Modifier.isTransient(mod) && f.getAnnotation(Exclude.class) == null)
+            if (!Modifier.isStatic(mod) && !Modifier.isTransient(mod) && f.getAnnotation(Exclude.class) == null) {
                 fieldMap.put(f.getName(), f);
+            }
         }
     }
 
     public final Instantiator<T> instantiator;
 
-    public RuntimeSchema(Class<T> typeClass, Collection<Field<T>> fields,
-            int lastFieldNumber, Constructor<T> constructor)
-    {
-        this(typeClass, fields, lastFieldNumber, new DefaultInstantiator<T>(
-                constructor));
+    public RuntimeSchema(Class<T> typeClass, Collection<Field<T>> fields, int lastFieldNumber, Constructor<T> constructor) {
+        this(typeClass, fields, lastFieldNumber, new DefaultInstantiator<>(constructor));
     }
 
-    public RuntimeSchema(Class<T> typeClass, Collection<Field<T>> fields,
-            int lastFieldNumber, Instantiator<T> instantiator)
-    {
+    public RuntimeSchema(Class<T> typeClass, Collection<Field<T>> fields, int lastFieldNumber, Instantiator<T> instantiator) {
         super(typeClass, fields, lastFieldNumber);
         this.instantiator = instantiator;
     }
@@ -344,45 +243,33 @@ public final class RuntimeSchema<T> extends MappedSchema<T>
      * Always returns true, everything is optional.
      */
     @Override
-    public boolean isInitialized(T message)
-    {
+    public boolean isInitialized(T message) {
         return true;
     }
 
     @Override
-    public T newMessage()
-    {
+    public T newMessage() {
         return instantiator.newInstance();
     }
 
     /**
      * Invoked only when applications are having pipe io operations.
      */
-    @SuppressWarnings("unchecked")
-    static <T> Pipe.Schema<T> resolvePipeSchema(Schema<T> schema,
-            Class<? super T> clazz, boolean throwIfNone)
-    {
-        if (Message.class.isAssignableFrom(clazz))
-        {
-            try
-            {
-                // use the pipe schema of code-generated messages if available.
-                java.lang.reflect.Method m = clazz.getDeclaredMethod(
-                        "getPipeSchema", new Class[] {});
+    @SuppressWarnings(value = { "unchecked" })
+    static <T extends java.lang.Object> Pipe.Schema<T> resolvePipeSchema(Schema<T> schema, Class<? super T> clazz, boolean throwIfNone) {
+        if (Message.class.isAssignableFrom(clazz)) {
+            try {
+                java.lang.reflect.Method m = clazz.getDeclaredMethod("getPipeSchema", new Class[] {});
                 return (Pipe.Schema<T>) m.invoke(null, new Object[] {});
-            }
-            catch (Exception e)
-            {
-                // ignore
+            } catch (Exception e) {
             }
         }
-
-        if (MappedSchema.class.isAssignableFrom(schema.getClass()))
+        if (MappedSchema.class.isAssignableFrom(schema.getClass())) {
             return ((MappedSchema<T>) schema).pipeSchema;
-
-        if (throwIfNone)
+        }
+        if (throwIfNone) {
             throw new RuntimeException("No pipe schema for: " + clazz);
-
+        }
         return null;
     }
 }
